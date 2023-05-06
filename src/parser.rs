@@ -6,7 +6,7 @@ pub struct Parser{
     tokens: Vec<Token>,
     current_token: Token,
     label_map: HashMap<String, u16>,
-    instruction_map: HashMap<String, InstructionType>,
+    instruction_map: HashMap<String, u16>,
     program_size: u16,
     index: usize,
 }
@@ -19,21 +19,21 @@ pub struct ParserError{
 
 impl Parser{
     pub fn new(tokens: Vec<Token>, label_map: HashMap<String, u16>) -> Self{
-        let instruction_map: HashMap<String, InstructionType> = HashMap::from([
-            (String::from("ADD"), InstructionType::Add),
-            (String::from("SUB"), InstructionType::Sub),
-            (String::from("AND"), InstructionType::And),
-            (String::from("OR"), InstructionType::Or),
-            (String::from("XOR"), InstructionType::Xor),
-            (String::from("NOT"), InstructionType::Not),
-            (String::from("LDX"), InstructionType::Ldx),
-            (String::from("LDY"), InstructionType::Ldy),
-            (String::from("STX"), InstructionType::Stx),
-            (String::from("STY"), InstructionType::Sty),
-            (String::from("JMP"), InstructionType::Jmp),
-            (String::from("JIC"), InstructionType::Jic),
-            (String::from("JIZ"), InstructionType::Jiz),
-            (String::from("HLT"), InstructionType::Hlt)
+        let instruction_map: HashMap<String, u16> = HashMap::from([
+            (String::from("ADD"), 0x0),
+            (String::from("SUB"), 0x1),
+            (String::from("AND"), 0x2),
+            (String::from("OR"),  0x3),
+            (String::from("XOR"), 0x4),
+            (String::from("NOT"), 0x5),
+            (String::from("LDX"), 0x6),
+            (String::from("LDY"), 0x7),
+            (String::from("STX"), 0x8),
+            (String::from("STY"), 0x9),
+            (String::from("JMP"), 0xA),
+            (String::from("JIC"), 0xB),
+            (String::from("JIZ"), 0xC),
+            (String::from("HLT"), 0xD)
         ]);
         Self{
             tokens: tokens.clone(),
@@ -116,15 +116,15 @@ impl Parser{
         }
         let argument: u16 = self.parse_argument()?;
         if let Some(instruction_type) = self.instruction_map.get(&name.clone()){
-            let mut instruction_type: InstructionType = (*instruction_type).clone();
+            let mut instruction_type: u16 = (*instruction_type).clone();
             if is_pointer_argument{
-                if instruction_type == InstructionType::Ldx{
-                    instruction_type = InstructionType::Ldxp;
-                }else if instruction_type == InstructionType::Ldy{
-                    instruction_type = InstructionType::Ldyp;
+                if instruction_type == 0x6{
+                    instruction_type = 0xE;
+                }else if instruction_type == 0x7{
+                    instruction_type = 0xF;
                 }
             }else{
-                if instruction_type == InstructionType::Stx ||  instruction_type == InstructionType::Sty{
+                if instruction_type == 0x8 ||  instruction_type == 0x9{
                     return Err(ParserError::from_token(format!("Expected a pointer argument for STX/STY instructions"), token));
                 }
             }

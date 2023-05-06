@@ -25,7 +25,7 @@ fn main(){
     }
     let source: String = remove_comments(std::fs::read_to_string(args[1].clone()).unwrap());
     if cfg!(debug_assertions){
-        println!("{}", source.clone());
+        println!("Source:\n{}", source.clone());
     }
     let mut lexer: Lexer = Lexer::new(source);
     match lexer.scan(){

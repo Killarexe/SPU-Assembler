@@ -6,7 +6,6 @@ ldx 45
 stx $0002   ;uint x = 45;
 ldx 32
 stx $0003   ;uint y = 32;
-jmp loop
 
 ;Loop start here.
 loop:
