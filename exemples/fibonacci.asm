@@ -12,7 +12,7 @@ ldx 9
 stx $0000   ; n = 9
 
 loop:
-  ldy 2
+  ldy 3
   sub
   ldy 128
   add

@@ -6,3 +6,4 @@ ldx 2
 ldy 2
 add
 stx $0000
+hlt
