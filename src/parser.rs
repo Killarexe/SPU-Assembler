@@ -59,7 +59,9 @@ impl Parser{
             self.advance();
             return Ok(());
         }
-        return Err(ParserError::from_token(format!("Unexpected token '{}'. Expected a token type {:#?}", self.current_token.get_value(), token_type), self.current_token.clone()))
+        return Err(ParserError::from_token(
+            format!("Unexpected token '{}'. Expected a token type {:#?}", self.current_token.get_value(), token_type), self.current_token.clone()
+        ));
     }
 
     pub fn parse_argument(&mut self) -> Result<u16, ParserError>{
@@ -87,14 +89,18 @@ impl Parser{
                 if let Ok(arg) = u16::from_str_radix(self.current_token.get_value().as_str(), 2){
                     return Ok(arg);
                 }
-                return Err(ParserError::from_token(format!("Expected a 16 bit or less binary number not {}", self.current_token.get_value()), self.current_token.clone()));
+                return Err(ParserError::from_token(
+                    format!("Expected a 16 bit or less binary number not {}", self.current_token.get_value()), self.current_token.clone()
+                ));
             },
             TokenType::AndSign => {
                 self.advance();
                 if let Ok(arg) = u16::from_str_radix(self.current_token.get_value().as_str(), 16){
                     return Ok(arg);
                 }
-                return Err(ParserError::from_token(format!("Expected a 16 bit or less hexadecimal number not {}", self.current_token.get_value()), self.current_token.clone()));
+                return Err(ParserError::from_token(
+                    format!("Expected a 16 bit or less hexadecimal number not {}", self.current_token.get_value()), self.current_token.clone())
+                );
             },
             _ => {
                 return Ok(0u16);

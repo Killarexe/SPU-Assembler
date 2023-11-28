@@ -2,35 +2,25 @@ mod instruction;
 mod parser;
 mod token;
 mod lexer;
+mod args;
 
+use args::*;
 use lexer::*;
-use parser::*;
-use std::fs::*;
-use regex::Regex;
-use std::env::args;
+use std::{fs::*, path::PathBuf};
+use clap::Parser;
 use std::io::Write;
 
-fn remove_comments(value: String) -> String{
-    let regex: Regex = Regex::new(r"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)").unwrap();
-    let value_no_c_comment: String = regex.replace_all(value.as_str(), "").to_string();
-    let regex_asm: Regex = Regex::new(r";.*").unwrap();
-    regex_asm.replace_all(value_no_c_comment.as_str(), "").to_string()
-}
 
 fn main(){
-    let args: Vec<String> = args().collect();
-    if args.len() < 2 {
-        println!("Usage: {} <file_input> (file_output)", args[0]);
-        return;
-    }
-    let source: String = remove_comments(std::fs::read_to_string(args[1].clone()).unwrap());
+    let args: AssemblerArgs = AssemblerArgs::parse();
+    let source: String = std::fs::read_to_string(args.input_file.clone()).expect("Failed to read file.");
     if cfg!(debug_assertions){
         println!("Source:\n{}", source.clone());
     }
     let mut lexer: Lexer = Lexer::new(source);
     match lexer.scan(){
         Ok(tokens) => {
-            let mut parser: Parser = Parser::new(tokens, lexer.get_label_map());
+            let mut parser: parser::Parser = parser::Parser::new(tokens, lexer.get_label_map());
             match parser.parse(){
                 Ok(instructions) => {
                     if cfg!(debug_assertions){
@@ -50,12 +40,9 @@ fn main(){
                             );
                         }
                     }
-                    let mut file_path: String = args[1].clone().replace(".asm", ".bin").replace(".s", ".bin");
-                    if let Some(file_name) = args.get(2){
-                        file_path = (*file_name).clone();
-                    }
-                    let mut file: File = File::create(file_path).unwrap();
-                    file.write_all(&bytes).unwrap();
+                    let file_path: PathBuf = args.get_file_output();
+                    let mut file: File = File::create(file_path).expect("Failed to create file!");
+                    file.write_all(&bytes).expect("Failed to write into file.");
                 },
                 Err(e) => {
                     e.report();

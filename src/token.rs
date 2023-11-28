@@ -43,7 +43,8 @@ impl Token{
         self.column.clone()
     }
 
-    /*pub fn as_string(&self) -> String{
+    #[cfg(debug_assertions)]
+    pub fn as_string(&self) -> String{
         format!("Token[type: {:#?}, value: {}, line: {}, column: {}]", self.token_type, self.value, self.line, self.column)
-    }*/
+    }
 }

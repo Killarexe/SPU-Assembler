@@ -1,4 +1,6 @@
 use crate::token::*;
+
+use regex::Regex;
 use std::collections::HashMap;
 
 pub struct Lexer{
@@ -11,9 +13,17 @@ pub struct Lexer{
     index: usize
 }
 
+fn remove_comments(value: String) -> String{
+    let regex: Regex = Regex::new(r"(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|(//.*)").unwrap();
+    let value_no_c_comment: String = regex.replace_all(value.as_str(), "").to_string();
+    let regex_asm: Regex = Regex::new(r";.*").unwrap();
+    regex_asm.replace_all(value_no_c_comment.as_str(), "").to_string()
+}
+
 impl Lexer{
     pub fn new(source: String) -> Self{
-        let src: Vec<char> = source.to_uppercase().chars().collect();
+        let full_source: String = remove_comments(source);
+        let src: Vec<char> = full_source.to_uppercase().chars().collect();
         Self{
             source: src.clone(),
             current_char: src[0],
