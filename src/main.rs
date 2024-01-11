@@ -54,3 +54,14 @@ fn main(){
         }
     }
 }
+
+fn open_file(args: AssemblerArgs) {
+    match std::fs::read_to_string(args.input_file.clone()) {
+        Ok(source) => {
+
+        },
+        Err(e) => {
+
+        }
+    }
+}
